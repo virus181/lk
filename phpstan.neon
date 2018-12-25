@@ -1,0 +1,22 @@
+parameters:
+    autoload_directories:
+        - %rootDir%/../../../tests
+        - %rootDir%/../../../controllers
+        - %rootDir%/../../../models
+        - %rootDir%/../../../widgets
+        - %rootDir%/../../../delivery
+        - %rootDir%/../../../components
+        - %rootDir%/../../../behaviors
+        - %rootDir%/../../../api
+        - %rootDir%/../../../workflow
+        - %rootDir%/../../../events
+        - %rootDir%/../../../rbac
+        - %rootDir%/../../../queue
+        - %rootDir%/../../../vendor/yiisoft
+    autoload_files:
+        - %rootDir%/../../../tests/_bootstrap.php
+        - %rootDir%/../../../vendor/autoload.php
+    ignoreErrors:
+        - '#Call to an undefined method yii\\console\\Request#'
+        - '#Call to an undefined method yii\\console\\Response#'
+        - '#Access to an undefined property yii\\console\\Request#'

@@ -1,0 +1,66 @@
+.table-bordered td {
+    border:1px solid #333;
+}
+
+#registry-list table {
+    margin:0;
+    padding:0;
+    border-spacing: 0;
+    border-collapse: collapse;
+}
+
+#registry-list td {
+    padding:3px 10px;
+    color:#333;
+}
+
+#registry-list td.cell-underlined {
+    border-bottom: 1px solid #333;
+}
+
+#registry-list td b {
+}
+
+#registry-list td.sub-title {
+    font-size: 15px;
+    font-weight: bold;
+    text-decoration: underline;
+    padding:0 0 0 10px;
+}
+
+#registry-list td.inner-cell {
+    padding:0;
+    color:#333;
+}
+
+#registry-list .table-bordered th {
+    border: 1px solid #333;
+}
+
+#registry-list .table-bordered > tbody > tr > td {
+    border: 1px solid #333;
+}
+
+#registry-list .table-bordered > thead > tr > th {
+    border: 1px solid #333;
+    padding:3px 10px;
+    font-family: "RalewayBold", Raleway, sans-serif;
+    color:#333;
+}
+
+#registry-list .order-list {
+    margin:30px 0;
+    text-align: center;
+}
+
+#registry-list .order-list th {
+    text-align: center;
+}
+
+#registry-list h2 {
+    padding:0 0 20px;
+}
+
+#registry-list h3 {
+    padding:0 0 50px;
+}

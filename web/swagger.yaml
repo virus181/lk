@@ -1,0 +1,852 @@
+swagger: '2.0'
+info:
+  version: 1.3.1
+  title: API Fastery Доставка
+  description: "Данное API предназначено для интеграции с Fastery Доставка. Перечисленные методы могут меняться с течением времени. Изменения могут происходить без предварительного уведомления.\n\n
+  Для теста воспользуйтесь демо-версией по адресу http://demo.fastery.ru/doc (предварительно пройдите регистрацию по адресу - http://demo.fastery.ru/signup).\n\n
+  Демо-кабинет не отличается от основного с точки зрения функциональности API."
+basePath: /api
+schemes:
+  - http
+consumes:
+  - application/json
+  - application/xml
+produces:
+  - application/json
+  - application/xml
+securityDefinitions:
+  AccessTokenAuth:
+    type: apiKey
+    in: query
+    name: access-token
+security:
+  - AccessTokenAuth: []
+paths:
+  /delivery/calculate:
+    get:
+      tags:
+        - Доставки
+      summary: Расчет стоимости доставки
+      description: Сервис расчета способов доставки. Данный сервис необходимо вызывать для того, что бы получить список возможных способов доставки с ценами и пр.
+      parameters:
+        - in: query
+          name: city
+          type: string
+          required: true
+          description: Город получателя
+        - in: query
+          name: city_fias_id
+          type: string
+          required: false
+          description: ID ФИАС города (используется для более точного расчета)
+        - in: query
+          name: cost
+          type: number
+          required: true
+          description: Общая сумма заказа в рублях
+        - in: query
+          name: assessed_cost
+          type: number
+          required: true
+          description: Общая сумма заказа в рублях используемая для страхования заказа
+        - in: query
+          name: weight
+          type: integet
+          required: true
+          description: Общий вес всего заказа в граммах
+        - in: query
+          name: shop_id
+          type: number
+          required: true
+          description: ID магазина для которого делается расчет стоимости и доступных способов доставки
+        - in: query
+          name: warehouse_id
+          type: number
+          required: false
+          description: ID склада исходя из адреса которого будет осуществлен расчет стоимости и доступных способов доставки (по умолчанию - ID склада по умолчанию для указанного магазина)
+        - in: query
+          name: fields
+          type: strind
+          required: false
+          description: Список возвращаемых в ответе полей через запятую (прим. 'cost,type' по умолчанию в ответе возвращаются все возможные поля)
+        - in: query
+          name: per-page
+          type: integet
+          required: false
+          description: Кол-во элементов в ответе (по умолчанию 20, макс. 50)
+        - in: query
+          name: page
+          type: integet
+          required: false
+          description: Номер страницы (по умолчанию 1)
+        - in: query
+          name: sort
+          type: string
+          required: false
+          description: Колонка по которой нужно отсортировать результат (прим. cost, -cost, min_term)
+        - in: query
+          name: all
+          type: bool
+          required: false
+          description: Вернуть все результаты расчета сразу (по умолчанию false)
+      responses:
+        '200':
+          description: 'Запрос успешно обработан'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/CalculateDeliveries"
+        '401':
+          description: 'Необходима авторизация'
+          schema:
+            $ref: "#/definitions/Exception"
+        '403':
+          description: 'Доступ запрещен'
+          schema:
+            $ref: "#/definitions/Exception"
+        '404':
+          description: 'Страница не найдена'
+          schema:
+            $ref: "#/definitions/Exception"
+        '405':
+          description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+          schema:
+            $ref: "#/definitions/Exception"
+        '422':
+          description: 'Ошибка валидации запроса'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/InvalidField"
+        '500':
+          description: 'Внутрянняя ошибка'
+          schema:
+            $ref: "#/definitions/Exception"
+  /order/view:
+    get:
+      tags:
+        - Заказы
+      summary: Информация о заказе
+      description: Сервис получение информации о заказе.
+      parameters:
+        - in: query
+          name: id
+          description: Id заказа в системе Fastery
+          type: integer
+          required: true
+          schema:
+            $ref: "#/definitions/CreateOrder"
+      responses:
+              '401':
+                description: 'Необходима авторизация'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '403':
+                description: 'Доступ запрещен'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '404':
+                description: 'Страница не найдена'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '405':
+                description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '422':
+                description: 'Ошибка валидации запроса'
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/definitions/InvalidField"
+              '500':
+                description: 'Внутрянняя ошибка'
+                schema:
+                  $ref: "#/definitions/Exception"
+  /order/statuses:
+    get:
+      tags:
+        - Заказы
+      summary: Статусы заказов
+      description: Сервис множественного получения статусов по заказам.
+      parameters:
+        - in: query
+          name: id
+          description: Id заказа(-ов) в системе Fastery, заказы можно указывать через запятую.
+          type: integer
+          required: true
+          schema:
+            $ref: "#/definitions/OrderStatuses"
+      responses:
+              '401':
+                description: 'Необходима авторизация'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '403':
+                description: 'Доступ запрещен'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '404':
+                description: 'Страница не найдена'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '405':
+                description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '422':
+                description: 'Ошибка валидации запроса'
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/definitions/InvalidField"
+              '500':
+                description: 'Внутрянняя ошибка'
+                schema:
+                  $ref: "#/definitions/Exception"
+  /order/status-history:
+    get:
+      tags:
+        - Заказы
+      summary: Трекинг заказа
+      description: Сервис получения истории статусов заказа по версии службы доставки.
+      parameters:
+        - in: query
+          name: id
+          description: Id заказа в системе Fastery
+          type: integer
+          required: true
+          schema:
+            $ref: "#/definitions/OrderStatusHistory"
+      responses:
+              '401':
+                description: 'Необходима авторизация'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '403':
+                description: 'Доступ запрещен'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '404':
+                description: 'Страница не найдена'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '405':
+                description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '422':
+                description: 'Ошибка валидации запроса'
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/definitions/InvalidField"
+              '500':
+                description: 'Внутрянняя ошибка'
+                schema:
+                  $ref: "#/definitions/Exception"
+  /order/create:
+    post:
+      tags:
+        - Заказы
+      summary: Создание заказа
+      description: Сервис создания заказа. Данный сервис предназначен для того, что бы передавать заказы в систему Fastery Доставка.
+      parameters:
+        - in: body
+          name: body
+          description: Объект запроса на создание заказа
+          type: object
+          required: true
+          schema:
+            $ref: "#/definitions/CreateOrder"
+      responses:
+              '401':
+                description: 'Необходима авторизация'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '403':
+                description: 'Доступ запрещен'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '404':
+                description: 'Страница не найдена'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '405':
+                description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+                schema:
+                  $ref: "#/definitions/Exception"
+              '422':
+                description: 'Ошибка валидации запроса'
+                schema:
+                  type: array
+                  items:
+                    $ref: "#/definitions/InvalidField"
+              '500':
+                description: 'Внутрянняя ошибка'
+                schema:
+                  $ref: "#/definitions/Exception"
+  /product/list:
+    get:
+      tags:
+        - Продукты
+      summary: Список продуктов в магазине
+      description: Сервис получения списка продуктов для магазина.
+      parameters:
+        - in: query
+          name: shop_id
+          type: number
+          required: true
+          description: ID магазина
+        - in: query
+          name: min_price
+          type: number
+          required: false
+          description: Минимальная цена товара
+        - in: query
+          name: max_price
+          type: number
+          required: false
+          description: Максимальная цена товара
+        - in: query
+          name: in_stock
+          type: bool
+          required: false
+          description: Наличие товара
+      responses:
+        '200':
+          description: 'Запрос успешно обработан'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Products"
+        '401':
+          description: 'Необходима авторизация'
+          schema:
+            $ref: "#/definitions/Exception"
+        '403':
+          description: 'Доступ запрещен'
+          schema:
+            $ref: "#/definitions/Exception"
+        '404':
+          description: 'Страница не найдена'
+          schema:
+            $ref: "#/definitions/Exception"
+        '405':
+          description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+          schema:
+            $ref: "#/definitions/Exception"
+        '422':
+          description: 'Ошибка валидации запроса'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/InvalidField"
+        '500':
+          description: 'Внутрянняя ошибка'
+          schema:
+            $ref: "#/definitions/Exception"
+  /warehouse/list:
+    get:
+      tags:
+        - Склады
+      summary: Список складов
+      description: Сервис получения списка складов для пользователя.
+      responses:
+        '200':
+          description: 'Запрос успешно обработан'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Warehouses"
+        '401':
+          description: 'Необходима авторизация'
+          schema:
+            $ref: "#/definitions/Exception"
+        '403':
+          description: 'Доступ запрещен'
+          schema:
+            $ref: "#/definitions/Exception"
+        '404':
+          description: 'Страница не найдена'
+          schema:
+            $ref: "#/definitions/Exception"
+        '405':
+          description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+          schema:
+            $ref: "#/definitions/Exception"
+        '422':
+          description: 'Ошибка валидации запроса'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/InvalidField"
+        '500':
+          description: 'Внутрянняя ошибка'
+          schema:
+            $ref: "#/definitions/Exception"
+  /label/list:
+    get:
+      tags:
+        - "Этикетки"
+      summary: Список этикеток
+      description: Сервис получения списка этикеток для указанных заказов.
+      parameters:
+        - in: query
+          name: order_id
+          type: string
+          required: true
+          description: Список заказов для которых необходимо получить этикетки (через запятую)
+      responses:
+        '200':
+          description: 'Запрос успешно обработан'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Warehouses"
+        '401':
+          description: 'Необходима авторизация'
+          schema:
+            $ref: "#/definitions/Exception"
+        '403':
+          description: 'Доступ запрещен'
+          schema:
+            $ref: "#/definitions/Exception"
+        '404':
+          description: 'Страница не найдена'
+          schema:
+            $ref: "#/definitions/Exception"
+        '405':
+          description: 'URL запроса верный, но указанный HTTP метод запроса не поддерживается'
+          schema:
+            $ref: "#/definitions/Exception"
+        '422':
+          description: 'Ошибка валидации запроса'
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/InvalidField"
+        '500':
+          description: 'Внутрянняя ошибка'
+          schema:
+            $ref: "#/definitions/Exception"
+definitions:
+  CalculateDeliveries:
+    type: object
+    properties:
+      uid:
+        type: string
+        example: 204def20cf0668955a80cdbcef4f87d1
+        description: 'Уникальный идентификатор доставки (должен быть передан при создании заказа)'
+      type:
+        type: string
+        enum: [courier, point]
+        example: point
+        description: 'Способ доставки (courier - курьером, point - в пвз)'
+      carrier_key:
+        type: string
+        example: cdek
+        description: 'ID службы доставки'
+      name:
+        type: string
+        example: 'Магистральный экспресс склад-склад'
+        description: 'Название тарифа'
+      cost:
+        type: float
+        example: 450
+        description: 'Стоимость доставки в рублях'
+      min_term:
+        type: integer
+        example: 3
+        description: 'Минимальный срок доставки'
+      max_term:
+        type: integer
+        example: 4
+        description: 'Максимальный срок доставки'
+      point_id:
+        type: integer
+        example: 486
+        description: 'ID пункта выдачи. Только для type - point'
+      point_type:
+        type: string
+        enum: [pvz, postamat, mail, terminal]
+        example: postamat
+        description: 'Тип пункта выдачи (pvz - пункт выдачи, postamat - атоматизированный пункт выдачи, mail - почтовое отделение, terminal - терминал СД). Только для type - point'
+      phone:
+        type: string
+        example: '78462218585, 78462033103'
+        description: 'Номер телефона пункта выдачи. Только для type - point'
+      point_address:
+        type: string
+        example: 'Самара, ул. Ново-Садовая, д. 220А'
+        description: 'Адрес пункта выдачи. Только для type - point'
+      lat:
+        type: float
+        example: '53.240978'
+        description: 'Широта пункта выдачи. Только для type - point'
+      lng:
+        type: float
+        example: '50.19706'
+        description: 'Долгота пункта выдачи. Только для type - point'
+      _links:
+        $ref: "#/definitions/Links"
+      _meta:
+        $ref: "#/definitions/Meta"
+    examples:
+      application/xml: <users><user>Alice</user><user>Bob</user></users>
+  Products:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 452
+        description: 'Уникальный идентификатор товара'
+      name:
+        type: string
+        example: 'Чашка для чая'
+        description: 'Наименование товара'
+      barcode:
+        type: string
+        example: 'A0001'
+        description: 'Артикул товара'
+      price:
+        type: number
+        example: 990
+        description: 'Цена товара'
+      weight:
+        type: number
+        example: 1000
+        description: 'Вес товара в граммах'
+      shop_id:
+        type: integer
+        example: 1
+        description: 'ID магазина'
+      in_stock:
+        type: integer
+        example: 15
+        description: 'Количество товаров в наличии'
+      stored:
+        type: bool
+        example: 1
+        description: 'Заведен ли товар в складскую систему Fastery'
+      _links:
+        $ref: "#/definitions/Links"
+      _meta:
+        $ref: "#/definitions/Meta"
+  Warehouses:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 452
+        description: 'Уникальный идентификатор склада'
+      name:
+        type: string
+        example: 'Склад на Сколковском шоссе'
+        description: 'Наименование склада'
+      contact_fio:
+        type: string
+        example: 'Иванов Петр Сергеевич'
+        description: 'Контактное лицо'
+      contact_phone:
+        type: string
+        example: '+7 (999) 999-99-99'
+        description: 'Контактный телефон'
+      address:
+        type: object
+        properties:
+          region:
+            type: string
+            example: "Москва"
+            required: false
+            description: 'Регион'
+          city:
+            type: string
+            example: "Москва"
+            required: true
+            description: 'Город'
+          city_fias_id:
+            type: string
+            example: "0c5b2444-70a0-4932-980c-b4dc0d3f02b5"
+            required: false
+            description: 'Идентификатор города по ФИАС'
+          street:
+            type: string
+            example: "Лесная"
+            required: false
+            description: 'Улица'
+          street_fias_id:
+            type: string
+            example: "8a63e928-8daf-4298-a30f-c19a770520ea"
+            required: false
+            description: 'Идентификатор улицы по ФИАС'
+          house:
+            type: string
+            example: "7с1"
+            required: false
+            description: 'Дом'
+          housing:
+            type: string
+            example: "3"
+            required: false
+            description: 'Корпус'
+          flat:
+            type: string
+            example: "60"
+            required: false
+            description: 'Квартира/офис'
+          postcode:
+            type: string
+            example: "125000"
+            required: false
+            description: 'Индекс'
+      _links:
+        $ref: "#/definitions/Links"
+      _meta:
+        $ref: "#/definitions/Meta"
+    examples:
+      application/xml: <users><user>Alice</user><user>Bob</user></users>
+  Links:
+    type: object
+    properties:
+      self:
+        type: object
+        properties:
+          href:
+            type: string
+            example: http://localhost:8881/api/deliveries/calculate?city=москва&cost=1&assessed_cost=1&weight=1&access-token=123&page=1
+            description: 'Ссылка на текущую страницу'
+      next:
+        type: object
+        properties:
+          href:
+            type: string
+            example: http://localhost:8881/api/deliveries/calculate?city=москва&cost=1&assessed_cost=1&weight=1&access-token=123&page=2
+            description: 'Ссылка на следующу страницу'
+      last:
+        type: object
+        properties:
+          href:
+            type: string
+            example: http://localhost:8881/api/deliveries/calculate?city=москва&cost=1&assessed_cost=1&weight=1&access-token=123&page=6
+            description: 'Ссылка на последнюю страницу'
+  Meta:
+    type: object
+    properties:
+      totalCount:
+        type: integer
+        example: 101
+        description: 'Общее количество элементов'
+      pageCount:
+        type: integer
+        example: 6
+        description: 'Общее количество страниц с элементами'
+      currentPage:
+        type: integer
+        example: 1
+        description: 'Текущая страница'
+      perPage:
+        type: integer
+        example: 1
+        description: 'Количество элементов на странице'
+  InvalidField:
+      type: object
+      properties:
+        field:
+          type: string
+          example: city
+          description: 'Имя поля содержащее ошибку'
+        message:
+          type: string
+          example: 'Необходимо заполнить «Город».'
+          description: 'Описание ошибки'
+  Exception:
+    type: object
+    properties:
+      name:
+        type: string
+        example: Unauthorized
+        description: 'Имя ошибки'
+      message:
+        type: string
+        example: Your request was made with invalid credentials
+        description: 'Сообщение об ошибке'
+      code:
+        type: integer
+        example: 0
+        description: 'Код ошибки (временно не используется)'
+      status:
+        type: integet
+        example: 401
+        description: 'Статус запроса'
+  OrderStatuses:
+    type: array
+    items:
+      properties:
+        id:
+          type: integer
+          example: 1001
+          required: true
+          description: Номер заказа в системе Fastery
+        status:
+          type: string
+          example: Создан
+          required: true
+          description: Статус заказа в системе Fastery
+  OrderStatusHistory:
+    type: array
+    items:
+      properties:
+        order_id:
+          type: integer
+          example: 1001
+          required: true
+          description: Номер заказа в системе Fastery
+        status:
+          type: string
+          example: Создан
+          required: true
+          description: Статус заказа в СД
+        description:
+          type: string
+          example: Зарегистрирована отправка в городе-отправителе. Консолидированный груз передан на доставку (в аэропорт/загружен машину)
+          required: false
+          description: Описание статуса
+        status_date:
+          type: string
+          example: 25.09.2017 в 21:00
+          required: true
+          description: Дата статуса
+  CreateOrder:
+    type: object
+    properties:
+          shop_id:
+            type: integer
+            example: 2
+            required: true
+            description: 'ID магазина'
+          shop_order_number:
+            type: string
+            example: ID128392
+            required: true
+            description: 'Номер заказа магазина (должен быть уникален в рамках указанного магазина)'
+          warehouse_id:
+            type: integer
+            example: 65
+            required: false
+            description: 'ID склада (по умолчанию - ID склада по умолчанию для указанного магазина)'
+          phone:
+            type: string
+            example: "+7 (963) 769-22-20"
+            required: true
+            description: 'Телефон покупателя (телефон обязательно должен начинаться с 7 или 8 или 9 и может содержать любые отличные от цифр символы)'
+          email:
+            type: string
+            example: "test@test.ru"
+            required: false
+            description: 'Email покупателя'
+          fio:
+            type: string
+            example: "Иванов Иван Иванович"
+            required: true
+            description: 'ФИО покупателя'
+          payment_method:
+            type: string
+            enum: [fullPay, noPay, deliveryPay, productPay]
+            example: fullPay
+            description: 'Наложенный платеж (по умолчанию fullPay; fullPay - оплата товара + доставки, noPay - оплата не требуется, deliveryPay - оплата только за доставку, productPay - оплата только за товар)'
+          products:
+            type: array
+            items:
+              properties:
+                name:
+                  type: string
+                  example: Чашка для чая
+                  required: true
+                  description: Наименование товара
+                barcode:
+                  type: string
+                  example: SKU-00001
+                  required: false
+                  description: Артикул товара
+                quantity:
+                  type: integer
+                  example: 2
+                  required: false
+                  description: Количество единиц товара (по умолчанию 1)
+                price:
+                  type: float
+                  example: 100.60
+                  required: false
+                  description: Стоимость одной единицы товара в рублях (по умолчанию 0)
+                weight:
+                  type: integer
+                  example: 250
+                  required: false
+                  description: Вес одной единицы товара в граммах (по умолчанию 0)
+          address:
+            type: object
+            properties:
+              region:
+                type: string
+                example: "Москва"
+                required: false
+                description: 'Регион покупателя'
+              city:
+                type: string
+                example: "Москва"
+                required: true
+                description: 'Город покупателя'
+              city_fias_id:
+                type: string
+                example: "0c5b2444-70a0-4932-980c-b4dc0d3f02b5"
+                required: false
+                description: 'Идентификатор города по ФИАС (обязательно если не задан city)'
+              street:
+                type: string
+                example: "Лесная"
+                required: false
+                description: 'Улица покупателя (обязательно для курьерской доставки)'
+              street_fias_id:
+                type: string
+                example: "8a63e928-8daf-4298-a30f-c19a770520ea"
+                required: false
+                description: 'Идентификатор улицы по ФИАС (обязательно для курьерской доставки если не задан street)'
+              house:
+                type: string
+                example: "7с1"
+                required: false
+                description: 'Дом покупателя (обязательно для курьерской доставки)'
+              housing:
+                type: string
+                example: "3"
+                required: false
+                description: 'Корпус покупателя'
+              flat:
+                type: string
+                example: "60"
+                required: false
+                description: 'Квартира/офис покупателя'
+              postcode:
+                type: string
+                example: "125000"
+                required: false
+                description: 'Индекс покупателя'
+          delivery:
+            type: object
+            properties:
+              cost:
+                type: float
+                example: 140.42
+                required: false
+                description: 'Стоимость доставки (по умолчанию расчитанная стоимость доставки)'
+              pickup_date:
+                type: string
+                example: '06.07.2017'
+                required: false
+                description: 'Предполагаемая дата передачи заказа в СД (по умолчанию следующий день за днем создания заказа)'
+              uid:
+                type: string
+                example: '204def20cf0668955a80cdbcef4f87d1'
+                required: true
+                description: 'Уникальный идентификатор доставки (пулучается в момент расчета стоимости доставки)'

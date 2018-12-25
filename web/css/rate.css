@@ -1,0 +1,117 @@
+.inventory-row {
+    margin-bottom: 10px;
+}
+
+.inventory-row input[type="number"] {
+    text-align: right;
+    padding-right: 25px;
+}
+
+.inventory-row input[type="text"] {
+    text-align: right;
+    padding-right: 25px;
+}
+
+.inventory-row .price_to input[type="number"],
+.inventory-row .price_from input[type="number"],
+.inventory-row .cost input[type="number"] {
+    padding-right: 35px;
+}
+
+.inventory-row .price_to input[type="text"],
+.inventory-row .price_from input[type="text"],
+.inventory-row .cost input[type="text"] {
+    padding-right: 35px;
+}
+
+.inventory-row .weight_from:before {
+    content: 'от ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    left: 25px;
+}
+
+.inventory-row .weight_from:after {
+    content: 'кг. ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    right: 25px;
+}
+
+.inventory-row .weight_to:before {
+    content: 'до ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    left: 25px;
+}
+
+.inventory-row .weight_to:after {
+    content: 'кг. ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    right: 25px;
+}
+
+.inventory-row .price_from:before {
+    content: 'от ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    left: 25px;
+}
+
+.inventory-row .price_from:after {
+    content: 'руб. ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    right: 25px;
+}
+
+.inventory-row .price_to:before {
+    content: 'до ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    left: 25px;
+}
+
+.inventory-row .price_to:after {
+    content: 'руб. ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    right: 25px;
+}
+
+.inventory-row .cost:after {
+    content: 'руб. ';
+    color: #999;
+    position: absolute;
+    top: 8px;
+    font-size: 12px;
+    right: 25px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+
+.action button {
+    float: right;
+}

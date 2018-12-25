@@ -1,0 +1,22 @@
+html,
+body {
+    height: 100%;
+    background-color: #f6fafb;
+    font-family: "RalewayLight", Raleway, sans-serif;
+}
+
+.block {
+    background-color: #fff;
+    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.21);
+    padding: 20px 5px 20px 5px;
+    margin-bottom: 20px;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+td {
+    padding: 5px 10px;
+}
